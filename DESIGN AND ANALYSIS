@@ -1,0 +1,103 @@
+Analysis: 
+
+Entities:
+1. Tree
+   - Attributes: Species, YearPlanted, Height, GrowthRate
+   - Methods: Constructor, toString(), Getters/Setters
+2. Forest
+   - Attributes: Name, Trees (List of Tree objects)
+   - Methods: Constructor, addTree(), cutTree(), simulateYearlyGrowth(), reapTree(), saveModifications(), print(), NextForest()
+
+
+3. ForestrySimulator
+   - Methods: main(), displayMenu()
+Actors:
+1. Forest
+   - Adds trees to a forest.
+   - Cuts trees from a forest.
+   - Reaps trees in a forest.
+   - Manages forests and their modifications.
+   - Utilizes the forestry simulation system.
+2. Menu
+   - Displays menu options.
+   - Provides interaction points for the user to control the simulation.
+
+Function Points:
+Actions by Actors (Forest):
+1. Add trees to a forest.
+2. Cut trees from a forest.
+3. Reap trees in a forest.
+4. Manage forests and their modifications.
+Actions by Non-Actors (Menu):
+1. Display menu options.
+2. Control the simulation based on user input.
+Scenarios:
+Forest 
+Decides to manage a forest (either Montane or Acadian).
+ They add trees to the forest by specifying species, year planted, height, and growth rate.
+3. They may cut down some trees if needed.
+4. The manager decides to simulate growth for a year for all trees in the forest.
+5. They reap trees above a certain height and replace them with new ones.
+6. Finally, the manager saves the modifications made to the forest.
+
+User Interaction
+The code displays menu options for the user.
+2. The user selects options like managing a forest or moving to the next forest CSV file.
+3. The system interacts with the appropriate methods in the ForestrySimulator class based on the user’s selection.
+4. The user receives feedback and continues interacting with the system as needed;
+-----------------------------------------------------------------------------------------------------------
+Design: 
+. Classes and Objects:
+Tree:
+Objects: Each tree in a forest
+
+Forest:
+Class: Represents a collection of trees
+Objects: Individual forests
+
+ForestrySimulator:
+Class: Main entry point for the simulation
+Data of Objects and Classes:
+
+Tree:
+Object Data:
+String Species
+Int Year planted
+Double Height
+Double Growth rate
+
+Forest:
+Class Data:
+None
+Object Data:
+String Name
+Array List of Trees
+
+ForestrySimulator:
+Class Data:
+None
+Object Data:
+None
+Methods of Objects and Classes:
+Tree:
+Constructors: Initialize with default values for species, year planted, height, and growth rate.
+toString: Represent tree information as a string.
+Accessors and Mutators: Getters and setters for attributes.
+
+Forest:
+Constructors: Initialize with a name and an empty list of trees.
+Methods:
+addTree: Add a tree to the forest.
+cutTree: Remove a tree from the forest.
+simulateYearlyGrowth: Simulate growth for one year for all trees in the forest.
+reapTree: Remove trees above a certain height and replace them with new trees.
+saveModifications: Save forest modifications to a file.
+print: Print the details of the forest.
+NextForest: move to the next forest CSV file 
+
+ForestrySimulator:
+Methods:
+main: Entry point of the program.
+displayMenu: Display menu options to the user.
+
+
