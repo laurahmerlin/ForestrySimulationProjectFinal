@@ -3,7 +3,7 @@ import java.io.*;
 import java.util.ArrayList;
 import java.io.IOException;
 
-import static ForestrySimulationProject.ForestrySimulationProject.forests;
+
 
 public class Forest {
 
@@ -64,19 +64,25 @@ public class Forest {
         return totalHeight / trees.size();
     }
     public static Forest loadForest(String fileName) throws IOException {
-        Forest forest = new Forest(fileName.replace(".csv", ""));
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName +  ".csv"))) {
+            ArrayList<Tree> aTreeData = new ArrayList<>();
             String line;
             while ((line = bufferedReader.readLine()) != null) {
-                String[] aTreeData = line.split(",");
-                Tree.Species species = Tree.Species.valueOf(aTreeData[0].toUpperCase());
-                int yearPlanted = Integer.parseInt(aTreeData[1]);
-                double treeHeight = Double.parseDouble(aTreeData[2]);
-                double growthRatePerYear = Double.parseDouble(aTreeData[3]);
-                addTree(new Tree(species, yearPlanted, treeHeight, growthRatePerYear));
+                String[] data = line.split(",");
+                Tree.Species species = Tree.Species.valueOf(data[0].toUpperCase());
+                int yearPlanted = Integer.parseInt(data[1]);
+                double treeHeight = Double.parseDouble(data[2]);
+                double growthRatePerYear = Double.parseDouble(data[3]);
+                aTreeData.add(new Tree(species, yearPlanted, treeHeight, growthRatePerYear));
             }
+            Forest newForest = new Forest();
+            newForest.forestName = fileName;
+            newForest.trees = aTreeData;
+            return newForest;
+        }catch (FileNotFoundException e){
+            System.out.println("Error reading file" + fileName);
+            return null;
         }
-        return forest;
     }
 
     public static void printForest() {

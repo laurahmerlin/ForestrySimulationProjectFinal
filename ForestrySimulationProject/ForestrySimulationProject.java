@@ -40,7 +40,7 @@ public class ForestrySimulationProject {
 
             switch (userInputMenu) {
                 case "P":
-                        Forest.printForest();
+                    Forest.printForest();
                     break;
                 case "A":
                     Forest.addTree(Tree.generateRandomTree());
@@ -79,6 +79,8 @@ public class ForestrySimulationProject {
             }
         } while (!(userInputMenu.equals("X")));
     }
+
+
     public static void nextForest() {
         currentForestIndex++;
         if (currentForestIndex < forests.length) {
@@ -88,6 +90,8 @@ public class ForestrySimulationProject {
             System.out.println("No more forests available.");
         }
     }
+
+
 
 
 }// END OF FORESTRY SIMULATION PROJECT CLASS
