@@ -2,16 +2,20 @@ package ForestrySimulationProject;
 
 import java.util.Random;
 
+import static java.util.stream.IntStream.range;
+
 public class Tree {
     private int yearPlanted;
     private double treeHeight;
     private double growthRatePerYear;
 
-    enum Species{
-        MAPLE,
+    enum Species {
+        BIRCH,
         FIR,
-        BIRCH
+        MAPLE
+
     }
+
     private Species species;
     public Tree( Species species, int yearPlanted, double treeHeight, double growthRatePerYear){
         this.yearPlanted = yearPlanted;
@@ -55,21 +59,21 @@ public class Tree {
     }
 
     public void simulateGrowthRate() {
-        double growthFactor = 1 + (growthRatePerYear / 100);
-        treeHeight *= growthFactor;
+       double growthFactor = 1 + (growthRatePerYear / 100);
+       treeHeight *= growthFactor;
     }
 
     public String toString(){
         return species + ", " + yearPlanted +", "+ String.format("%.1f", treeHeight)+ ", " + String.format("%.1f", growthRatePerYear)+ "%";
     }
 
-    Tree generateRandomTree() {
+    static Tree generateRandomTree() {
         Random rand = new Random();
         Species[] species = Species.values();
         Species randomSpecies = species[rand.nextInt(species.length)];
         int randomYear = rand.nextInt(25) + 2000;
-        double randomHeight = rand.nextDouble() * 10 + 10;
-        double randomGrowthRate = rand.nextDouble() * 10 + 10;
+        double randomHeight = rand.nextDouble() * ( 50 - 20 ) + 50;
+        double randomGrowthRate = rand.nextDouble() * 10 + 5;
         return new Tree(randomSpecies, randomYear, randomHeight, randomGrowthRate);
     }
 

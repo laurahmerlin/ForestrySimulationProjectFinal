@@ -1,56 +1,40 @@
 package ForestrySimulationProject;
 import java.io.*;
 import java.util.ArrayList;
+import java.io.IOException;
+
+import static ForestrySimulationProject.ForestrySimulationProject.forests;
 
 public class Forest {
 
-    private final String forestName;
-    private ArrayList<Tree> trees;
+    private  static String forestName;
+    private  static ArrayList<Tree> trees;
 
+
+    public Forest(){
+        forestName = null;
+        trees = null;
+    }
     public Forest(String forestName) {
-        this.forestName = forestName;
-        this.trees = new ArrayList<>();
+        Forest.forestName = forestName;
+        trees = new ArrayList<>();
 
     }
 
-    public String getName() {
+    public static String getName() {
         return forestName;
     }
 
-    public ArrayList<Tree> getTrees() {
+    public static ArrayList<Tree> getTrees() {
         return trees;
     }
 
-    public void addTree(Tree trees) {
-        this.trees.add(trees);
+    public static void addTree(Tree tree) {
+        trees.add(Tree.generateRandomTree());
     }
 
-    public static Forest readForestFromCSV(String fileName) {
-        Forest newForest = new Forest(fileName);
 
-        try {
-            BufferedReader inFile = new BufferedReader(new FileReader(fileName +".csv"));
-            String currentLine = inFile.readLine();
-            while (currentLine != null) {
-                String[] aTreeData = currentLine.split(",");
-                Tree.Species species = Tree.Species.valueOf(aTreeData[0].toUpperCase());
-                int yearPlanted = Integer.parseInt(aTreeData[1]);
-                double treeHeight = Double.parseDouble(aTreeData[2]);
-                double growthRatePerYear = Double.parseDouble(aTreeData[3]);
-
-                Tree newTree = new Tree(species, yearPlanted, treeHeight, growthRatePerYear);
-                newForest.addTree(newTree);
-                currentLine = inFile.readLine();
-
-            }// end of while loop
-        } catch (IOException e) {
-            System.out.println("Error reading forest file: " + e.getMessage());
-
-        }
-        return newForest;
-    }// end of read file from csv method
-
-    public void cutTree(int index) {
+    public static void cutTree(int index) {
         if (index >= 0 && index < trees.size()) {
             trees.remove(index);
         } else {
@@ -58,17 +42,13 @@ public class Forest {
         }
     }
 
-    public void simulateYearlyGrowth() {
-        for (Tree tree : trees) {
-            tree.simulateGrowthRate();
-        }
-    }
-
-    public void reapTrees(double heightRange) {
+    public static void reapTrees(double heightRange) {
         ArrayList<Tree> newTrees = new ArrayList<>();
         for (Tree tree : trees) {
             if (tree.getHeight() > heightRange) {
-                newTrees.add(tree.generateRandomTree());
+                System.out.println("Reaping the tall tree " + tree);
+                newTrees.add(Tree.generateRandomTree());
+                System.out.println("Replacing with new tree: " +newTrees);
             } else {
                 newTrees.add(tree);
             }
@@ -76,60 +56,57 @@ public class Forest {
         trees = newTrees;
     }
 
-    public double calculateAverageHeight() {
+    public static double calculateAverageHeight() {
         double totalHeight = 0;
         for (Tree tree : trees) {
             totalHeight += tree.getHeight();
         }
         return totalHeight / trees.size();
     }
-
-    public void printForest() {
-        System.out.println("Forest name: " + forestName);
-        for (int i = 0; i < trees.size(); i++) {
-            System.out.println("   " + i + " " + trees.get(i));
+    public static Forest loadForest(String fileName) throws IOException {
+        Forest forest = new Forest(fileName.replace(".csv", ""));
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fileName +  ".csv"))) {
+            String line;
+            while ((line = bufferedReader.readLine()) != null) {
+                String[] aTreeData = line.split(",");
+                Tree.Species species = Tree.Species.valueOf(aTreeData[0].toUpperCase());
+                int yearPlanted = Integer.parseInt(aTreeData[1]);
+                double treeHeight = Double.parseDouble(aTreeData[2]);
+                double growthRatePerYear = Double.parseDouble(aTreeData[3]);
+                addTree(new Tree(species, yearPlanted, treeHeight, growthRatePerYear));
+            }
         }
-        System.out.println("There are " + trees.size() + " trees, with an average height of " + String.format("%.2f", calculateAverageHeight()));
+        return forest;
     }
 
-    public void saveModifications() {
-        String fileName = forestName + ".csv";
-        try (FileOutputStream fileOut = new FileOutputStream(fileName);
-             ObjectOutputStream objectOut = new ObjectOutputStream(fileOut)) {
-            objectOut.writeObject(this);
+    public static void printForest() {
+        System.out.println("Forest name: " + getName());
+        for (int i = 0; i < trees.size(); i++) {
+            Tree tree = trees.get(i);
+            System.out.printf("    %d %s   %d   %.2f'  %.1f%%\n", i, tree.getSpecies(), tree.getYearPlanted(),
+                    tree.getHeight(), tree.getGrowthRate());
+        }
+        System.out.printf("There are %d trees, with an average height of %.2f\n", trees.size(), calculateAverageHeight());
+    }
+
+
+
+
+    public static void saveModifications() {
+        String fileName = forestName + ".db";
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(fileName))) {
+            for (Tree tree : trees) {
+                writer.write(tree.getSpecies() + "," + tree.getYearPlanted() + "," +
+                        tree.getHeight() + "," + tree.getGrowthRate());
+                writer.newLine();
+            }
             System.out.println("Forest saved to " + fileName);
         } catch (IOException e) {
             System.out.println("Error saving forest: " + e.getMessage());
         }
     }
-    public static Forest loadForest(String fileName) {
-        Forest loadedForest = null;
-        try (FileInputStream fileIn = new FileInputStream(fileName);
-             ObjectInputStream objectIn = new ObjectInputStream(fileIn)) {
-            loadedForest = (Forest) objectIn.readObject();
-            System.out.println("Forest loaded from " + fileName);
-        } catch (IOException | ClassNotFoundException e) {
-            System.out.println("Error loading forest: " + e.getMessage());
-        }
-        return loadedForest;
-    }
 
-    public static void nextForest(ArrayList<String> forestNames) {
-        int currentForestIndex = 0;
-        if (currentForestIndex < forestNames.size() - 1) {
-            currentForestIndex++;
-            String nextForestName = forestNames.get(currentForestIndex);
-            Forest nextForest = loadForest(nextForestName);
-            if (nextForest != null) {
-                System.out.println("Moving to the next forest: " + nextForestName);
-                // Perform any other operations needed for transitioning to the next forest
-            } else {
-                System.out.println("Failed to load the next forest.");
-            }
-        } else {
-            System.out.println("No more forests available.");
-        }
-    }
+
 
 }
 

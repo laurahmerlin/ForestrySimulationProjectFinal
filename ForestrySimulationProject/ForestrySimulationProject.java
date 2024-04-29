@@ -1,7 +1,6 @@
 package ForestrySimulationProject;
-import java.util.ArrayList;
+import java.io.IOException;
 import java.util.Scanner;
-
 
 
 /**
@@ -11,21 +10,19 @@ import java.util.Scanner;
  */
 
 public class ForestrySimulationProject {
-    private static Forest forest;
-    private ArrayList<Forest> forests = new ArrayList<>();
-    private int currentForestIndex = -1;
+
+    static Forest[] forests;
+    private static int currentForestIndex = -1;
     private static final Scanner keyboard = new Scanner(System.in);
-    private static Object forestNames;
 
-
-
-
-    public static void main(String[] args)  {
-        String[] forestNames = {"Montane", "Acadian"};
-        Forest[] forests = new Forest[forestNames.length];
-        for (int i = 0; i < forestNames.length; i++) {
-            forests[i] = Forest.readForestFromCSV(forestNames[i]);
-            forest = forests[0];
+    public static void main(String[] args) throws IOException {
+        if (args.length == 0) {
+            System.out.println("No forest names provided.");
+            return;
+        }
+        forests = new Forest[args.length];
+        for (int i = 0; i < args.length; i++) {
+            forests[i] = Forest.loadForest(args[i]);
         }
 
         System.out.println("Welcome to the Forestry Simulation\n -----------------------------------");
@@ -33,8 +30,9 @@ public class ForestrySimulationProject {
     }
 
 
-    private static void menu()  {
+    private static void menu() throws IOException {
         String userInputMenu;
+        Forest forest;
 
         do {
             System.out.print("(P)rint, (A)dd, (C)ut, (G)row, (R)eap, (S)ave, (L)oad, (N)ext, e(X)it: ");
@@ -42,41 +40,54 @@ public class ForestrySimulationProject {
 
             switch (userInputMenu) {
                 case "P":
-                    forest.printForest();
+                        Forest.printForest();
                     break;
                 case "A":
-
-                    //forest.addTree(Tree trees);
+                    Forest.addTree(Tree.generateRandomTree());
+                    break;
                 case "C":
-                    int Tree = 0;
-                    forest.cutTree(Tree);
+                    System.out.print("Tree number to cut down: ");
+                    int treeIndex = keyboard.nextInt();
+                    Forest.cutTree(treeIndex);
+                    break;
+                case "G":
+                    for (Tree tree : Forest.getTrees()) {
+                        tree.simulateGrowthRate();
+                    }
+                    break;
                 case "R":
-                    double heightRange= 0 ;
-                    forest.reapTrees(heightRange);
+                    System.out.print("Height to reap from: ");
+                    double heightRange = keyboard.nextDouble();
+                    Forest.reapTrees(heightRange);
                     break;
                 case "S":
-                    forest.saveModifications();
+                    Forest.saveModifications();
                     break;
                 case "L":
-                    Object fileName = new Object();
-                    Forest.loadForest((String) fileName);
+                    System.out.print("Enter forest name: ");
+                    String forestName = keyboard.next();
+                    forest = Forest.loadForest(forestName);
                     break;
                 case "N":
-                    ArrayList<String> forestNames = new ArrayList<>();
-                    Forest.nextForest(forestNames);
+                    nextForest();
+                    break;
                 case "X":
                     System.out.println("Exiting Forestry Simulation");
                     break;
                 default:
-                    System.out.println("ERROR: Invalid option, try again      :");
+                    System.out.println("ERROR: Invalid option, try again:");
             }
         } while (!(userInputMenu.equals("X")));
-
-    }// END MENU METHOD
-
-
-
-
+    }
+    public static void nextForest() {
+        currentForestIndex++;
+        if (currentForestIndex < forests.length) {
+            Forest nextForest = forests[currentForestIndex];
+            System.out.println("Moving to the next forest: " + nextForest.getName());
+        } else {
+            System.out.println("No more forests available.");
+        }
+    }
 
 
 }// END OF FORESTRY SIMULATION PROJECT CLASS
